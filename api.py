@@ -1,17 +1,14 @@
-import hmac
 import hashlib
+import hmac
 import json
+import sqlite3
 from urllib.parse import parse_qs
-from fastapi import FastAPI, Header, HTTPException, Depends
+from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 import httpx
 
-# Импорты ваших моделей и подключения к БД
-from config import BOT_TOKEN
-from database import get_db
-from models import User
+# Токен твоего Telegram-бота
+BOT_TOKEN = "8744785117:AAGhQuyvVW5WAqqEJBoRoK7JI5kUpyq1NTQ"  # Укажи токен бота из @BotFather
 
 app = FastAPI(title="CryptoKassa API")
 
@@ -53,7 +50,7 @@ def verify_telegram_data(init_data: str) -> dict:
 
         return json.loads(user_json)
     except Exception:
-        raise HTTPException(status_code=401, detail="Ошибка обработки данных авторизации")
+        raise HTTPException(status_code=401, detail="Ошибка авторизации")
 
 async def get_crypto_rates() -> dict:
     url = "https://api.coingecko.com/api/v3/simple/price?ids=tether,toncoin,bitcoin&vs_currencies=usd"
@@ -70,15 +67,19 @@ async def get_crypto_rates() -> dict:
         return {"USDT": 1.0, "TON": 5.2, "BTC": 65000.0}
 
 @app.get("/api/me")
-async def get_user_profile(x_init_data: str = Header(None), db: AsyncSession = Depends(get_db)):
+async def get_user_profile(x_init_data: str = Header(None)):
     tg_user = verify_telegram_data(x_init_data or "")
     user_id = tg_user.get("id")
 
-    stmt = select(User).where(User.user_id == user_id)
-    res = await db.execute(stmt)
-    user = res.scalar_one_or_none()
+    # Прямое подключение к файлу базы данных SQLite
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT balance_usdt, balance_ton, balance_btc FROM users WHERE user_id = ?", (user_id,))
+    row = cursor.fetchone()
+    conn.close()
 
-    if not user:
+    if not row:
         return {
             "user_id": user_id,
             "nickname": tg_user.get("first_name", "User"),
@@ -86,11 +87,8 @@ async def get_user_profile(x_init_data: str = Header(None), db: AsyncSession = D
             "total_usd": 0.0
         }
 
+    usdt_bal, ton_bal, btc_bal = float(row[0] or 0), float(row[1] or 0), float(row[2] or 0)
     rates = await get_crypto_rates()
-
-    usdt_bal = float(user.balance_usdt or 0.0)
-    ton_bal = float(user.balance_ton or 0.0)
-    btc_bal = float(user.balance_btc or 0.0)
 
     total_usd = (
         usdt_bal * rates.get("USDT", 1.0) +
@@ -99,8 +97,8 @@ async def get_user_profile(x_init_data: str = Header(None), db: AsyncSession = D
     )
 
     return {
-        "user_id": user.user_id,
-        "nickname": getattr(user, "custom_nickname", None) or tg_user.get("first_name"),
+        "user_id": user_id,
+        "nickname": tg_user.get("first_name", "User"),
         "balances": {
             "USDT": usdt_bal,
             "TON": ton_bal,
