@@ -10,10 +10,8 @@
             --bg-color: #121820;
             --card-bg: #1c2733;
             --header-bg: #2a221b;
-            --accent-orange: #f2a900;
             --text-color: #ffffff;
             --text-secondary: #8b96a3;
-            --button-bg: rgba(255, 255, 255, 0.1);
         }
 
         * {
@@ -31,12 +29,11 @@
             overflow-x: hidden;
         }
 
-        /* Шапка с градиентом под темное дерево */
+        /* Шапка */
         .header {
             background: linear-gradient(180deg, #3d2b20 0%, #201712 100%);
             padding: 16px 20px 24px 20px;
             text-align: center;
-            position: relative;
         }
 
         .top-bar {
@@ -115,7 +112,7 @@
             font-weight: 500;
         }
 
-        /* Баннер акций */
+        /* Баннер */
         .banner-container {
             padding: 16px;
             background: var(--bg-color);
@@ -129,7 +126,6 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            cursor: pointer;
         }
 
         .banner-content {
@@ -138,28 +134,10 @@
             gap: 12px;
         }
 
-        .banner-icon {
-            font-size: 28px;
-        }
+        .banner-icon { font-size: 28px; }
+        .banner-title { color: #ff5e3a; font-size: 14px; font-weight: 600; }
+        .banner-desc { font-size: 12px; color: #d1d5db; margin-top: 2px; }
 
-        .banner-title {
-            color: #ff5e3a;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .banner-desc {
-            font-size: 12px;
-            color: #d1d5db;
-            margin-top: 2px;
-        }
-
-        .banner-arrow {
-            color: var(--text-secondary);
-            font-size: 18px;
-        }
-
-        /* Пагинация баннера */
         .dots {
             display: flex;
             justify-content: center;
@@ -167,24 +145,11 @@
             margin-top: 10px;
         }
 
-        .dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-        }
+        .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); }
+        .dot.active { width: 16px; border-radius: 4px; background: #0088cc; }
 
-        .dot.active {
-            width: 16px;
-            border-radius: 4px;
-            background: #0088cc;
-        }
-
-        /* Секция активов */
-        .assets-section {
-            padding: 0 16px;
-        }
-
+        /* Список активов */
+        .assets-section { padding: 0 16px; }
         .assets-header {
             display: flex;
             justify-content: space-between;
@@ -192,27 +157,8 @@
             margin-bottom: 12px;
         }
 
-        .assets-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #0088cc;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
-        }
-
-        .hide-small {
-            font-size: 13px;
-            color: #0088cc;
-            cursor: pointer;
-        }
-
-        .asset-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1px;
-        }
+        .assets-title { font-size: 16px; font-weight: 600; color: #0088cc; }
+        .hide-small { font-size: 13px; color: #0088cc; cursor: pointer; }
 
         .asset-item {
             display: flex;
@@ -222,12 +168,7 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .asset-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
+        .asset-left { display: flex; align-items: center; gap: 12px; }
         .asset-logo {
             width: 40px;
             height: 40px;
@@ -243,36 +184,15 @@
         .logo-ton { background: #0088cc; color: white; }
         .logo-btc { background: #f7931a; color: white; }
 
-        .asset-name {
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .asset-sub {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 2px;
-        }
-
-        .asset-right {
-            text-align: right;
-        }
-
-        .asset-amount {
-            font-size: 15px;
-            font-weight: 600;
-        }
-
-        .asset-converted {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 2px;
-        }
+        .asset-name { font-size: 16px; font-weight: 600; }
+        .asset-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+        .asset-right { text-align: right; }
+        .asset-amount { font-size: 15px; font-weight: 600; }
+        .asset-converted { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
     </style>
 </head>
 <body>
 
-    <!-- Шапка -->
     <div class="header">
         <div class="top-bar">
             <div class="icon-btn">📷</div>
@@ -283,28 +203,27 @@
         </div>
 
         <div class="main-balance">
-            <span id="fiat-symbol">$</span> <span id="total-balance">0.00</span>
+            <span>$</span><span id="total-balance">0.00</span>
             <span class="eye-icon" onclick="toggleHide()">👁</span>
         </div>
         <div class="balance-subtitle">Общий баланс в USD</div>
 
         <div class="action-buttons">
-            <div class="action-item" onclick="sendAction('deposit')">
+            <div class="action-item" onclick="handleAction('deposit')">
                 <div class="action-icon">↙</div>
                 <div class="action-label">Пополнить</div>
             </div>
-            <div class="action-item" onclick="sendAction('withdraw')">
+            <div class="action-item" onclick="handleAction('withdraw')">
                 <div class="action-icon">↗</div>
                 <div class="action-label">Вывести</div>
             </div>
-            <div class="action-item" onclick="sendAction('history')">
+            <div class="action-item" onclick="handleAction('history')">
                 <div class="action-icon">📅</div>
                 <div class="action-label">История</div>
             </div>
         </div>
     </div>
 
-    <!-- Информационный баннер -->
     <div class="banner-container">
         <div class="banner">
             <div class="banner-content">
@@ -314,7 +233,6 @@
                     <div class="banner-desc">Криптовалютные подарки всем активным пользователям!</div>
                 </div>
             </div>
-            <div class="banner-arrow">›</div>
         </div>
         <div class="dots">
             <div class="dot active"></div>
@@ -323,7 +241,6 @@
         </div>
     </div>
 
-    <!-- Список активов -->
     <div class="assets-section">
         <div class="assets-header">
             <div class="assets-title">Мои активы ›</div>
@@ -331,12 +248,13 @@
         </div>
 
         <div class="asset-list">
+            <!-- Tether -->
             <div class="asset-item">
                 <div class="asset-left">
                     <div class="asset-logo logo-usdt">₮</div>
                     <div>
                         <div class="asset-name">Tether</div>
-                        <div class="asset-sub">$1.00 <span style="color: #4caf50;">0.00%</span></div>
+                        <div class="asset-sub">$1.00</div>
                     </div>
                 </div>
                 <div class="asset-right">
@@ -345,12 +263,13 @@
                 </div>
             </div>
 
+            <!-- Toncoin -->
             <div class="asset-item">
                 <div class="asset-left">
                     <div class="asset-logo logo-ton">💎</div>
                     <div>
                         <div class="asset-name">Toncoin</div>
-                        <div class="asset-sub" id="ton-rate">$5.20</div>
+                        <div class="asset-sub">$5.20</div>
                     </div>
                 </div>
                 <div class="asset-right">
@@ -359,12 +278,13 @@
                 </div>
             </div>
 
+            <!-- Bitcoin -->
             <div class="asset-item">
                 <div class="asset-left">
                     <div class="asset-logo logo-btc">₿</div>
                     <div>
                         <div class="asset-name">Bitcoin</div>
-                        <div class="asset-sub" id="btc-rate">$65,000</div>
+                        <div class="asset-sub">$65,000</div>
                     </div>
                 </div>
                 <div class="asset-right">
@@ -380,19 +300,25 @@
         tg.expand();
         tg.setHeaderColor('#3d2b20');
 
+        // Ссылка на твой сервер ngrok
         const API_URL = "https://defiant-clothes-mandarin.ngrok-free.dev";
 
         let isHidden = false;
 
         function toggleHide() {
             isHidden = !isHidden;
-            const bal = document.getElementById('total-balance');
-            bal.innerText = isHidden ? '••••••' : (window.totalVal || '0.00');
+            document.getElementById('total-balance').innerText = isHidden ? '••••••' : (window.totalVal || '0.00');
         }
 
-        function sendAction(action) {
-            tg.sendData(JSON.stringify({ action: action }));
-            tg.close();
+        // Обработка кликов по кнопкам без падения приложения
+        function handleAction(action) {
+            if (action === 'deposit') {
+                tg.showAlert("Для пополнения отправьте криптовалюту на ваш адрес в меню бота.");
+            } else if (action === 'withdraw') {
+                tg.showAlert("Функция вывода средств откроется в следующем окне.");
+            } else if (action === 'history') {
+                tg.showAlert("История транзакций загружается...");
+            }
         }
 
         async function loadData() {
@@ -405,26 +331,32 @@
                 });
 
                 if (!res.ok) {
-                    console.error("Сервер вернул ошибку:", res.status);
+                    console.error("HTTP error:", res.status);
                     return;
                 }
 
                 const data = await res.json();
 
-                window.totalVal = data.total_usd.toFixed(2);
+                window.totalVal = Number(data.total_usd).toFixed(2);
                 document.getElementById('total-balance').innerText = window.totalVal;
 
-                document.getElementById('usdt-val').innerText = `${data.balances.USDT.toFixed(2)} USDT`;
-                document.getElementById('usdt-usd').innerText = `$${data.balances.USDT.toFixed(2)}`;
+                // Балансы USDT
+                const usdt = Number(data.balances.USDT || 0);
+                document.getElementById('usdt-val').innerText = `${usdt.toFixed(2)} USDT`;
+                document.getElementById('usdt-usd').innerText = `$${usdt.toFixed(2)}`;
 
-                document.getElementById('ton-val').innerText = `${data.balances.TON.toFixed(4)} TON`;
-                document.getElementById('btc-val').innerText = `$${(data.balances.TON * 5.2).toFixed(2)}`;
+                // Балансы TON
+                const ton = Number(data.balances.TON || 0);
+                document.getElementById('ton-val').innerText = `${ton.toFixed(2)} TON`;
+                document.getElementById('ton-usd').innerText = `$${(ton * 5.2).toFixed(2)}`;
 
-                document.getElementById('btc-val').innerText = `${data.balances.BTC.toFixed(6)} BTC`;
-                document.getElementById('btc-usd').innerText = `$${(data.balances.BTC * 65000).toFixed(2)}`;
+                // Балансы BTC
+                const btc = Number(data.balances.BTC || 0);
+                document.getElementById('btc-val').innerText = `${btc.toFixed(4)} BTC`;
+                document.getElementById('btc-usd').innerText = `$${(btc * 65000).toFixed(2)}`;
 
             } catch (e) {
-                console.error(" Ошибка загрузки данных:", e);
+                console.error("Ошибка загрузки данных:", e);
             }
         }
 
