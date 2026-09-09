@@ -7,8 +7,7 @@ from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import httpx
 
-# Токен твоего Telegram-бота
-BOT_TOKEN = "8744785117:AAGhQuyvVW5WAqqEJBoRoK7JI5kUpyq1NTQ"  # Укажи токен бота из @BotFather
+BOT_TOKEN = "ТВОЙ_ТОКЕН_БОТА"  # Вставь токен из @BotFather
 
 app = FastAPI(title="CryptoKassa API")
 
@@ -71,7 +70,6 @@ async def get_user_profile(x_init_data: str = Header(None)):
     tg_user = verify_telegram_data(x_init_data or "")
     user_id = tg_user.get("id")
 
-    # Прямое подключение к файлу базы данных SQLite
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
     
