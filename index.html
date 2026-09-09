@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CryptoKassa</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-color: #121820;
+            --card-bg: #1c2733;
+            --header-bg: #2a221b;
+            --accent-orange: #f2a900;
+            --text-color: #ffffff;
+            --text-secondary: #8b96a3;
+            --button-bg: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Шапка с градиентом под дерево/темный шоколад */
+        .header {
+            background: linear-gradient(180deg, #3d2b20 0%, #201712 100%);
+            padding: 16px 20px 24px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .top-right {
+            display: flex;
+            gap: 10px;
+        }
+
+        .main-balance {
+            font-size: 36px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .eye-icon {
+            font-size: 20px;
+            opacity: 0.7;
+            cursor: pointer;
+        }
+
+        .balance-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            margin-bottom: 24px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+        }
+
+        .action-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .action-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .action-label {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* Баннер акций */
+        .banner-container {
+            padding: 16px;
+            background: var(--bg-color);
+        }
+
+        .banner {
+            background: #2a2024;
+            border-left: 4px solid #ff5e3a;
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .banner-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .banner-icon {
+            font-size: 28px;
+        }
+
+        .banner-title {
+            color: #ff5e3a;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .banner-desc {
+            font-size: 12px;
+            color: #d1d5db;
+            margin-top: 2px;
+        }
+
+        .banner-arrow {
+            color: var(--text-secondary);
+            font-size: 18px;
+        }
+
+        /* Пагинация баннера */
+        .dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .dot.active {
+            width: 16px;
+            border-radius: 4px;
+            background: #0088cc;
+        }
+
+        /* Секция активов */
+        .assets-section {
+            padding: 0 16px;
+        }
+
+        .assets-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .assets-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0088cc;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .hide-small {
+            font-size: 13px;
+            color: #0088cc;
+            cursor: pointer;
+        }
+
+        .asset-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .asset-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .asset-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .asset-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .logo-usdt { background: #26a17b; color: white; }
+        .logo-ton { background: #0088cc; color: white; }
+        .logo-btc { background: #f7931a; color: white; }
+
+        .asset-name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .asset-sub {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .asset-right {
+            text-align: right;
+        }
+
+        .asset-amount {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .asset-converted {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Шапка с кнопками действий -->
+    <div class="header">
+        <div class="top-bar">
+            <div class="icon-btn">📷</div>
+            <div class="top-right">
+                <div class="icon-btn">🖼</div>
+                <div class="icon-btn">⚙️</div>
+            </div>
+        </div>
+
+        <div class="main-balance">
+            <span id="fiat-symbol">$</span> <span id="total-balance">0.00</span>
+            <span class="eye-icon" onclick="toggleHide()">👁</span>
+        </div>
+        <div class="balance-subtitle">Общий баланс в USD</div>
+
+        <div class="action-buttons">
+            <div class="action-item" onclick="tg.sendData('action_deposit')">
+                <div class="action-icon">↙</div>
+                <div class="action-label">Пополнить</div>
+            </div>
+            <div class="action-item" onclick="tg.sendData('action_withdraw')">
+                <div class="action-icon">↗</div>
+                <div class="action-label">Вывести</div>
+            </div>
+            <div class="action-item" onclick="tg.sendData('action_history')">
+                <div class="action-icon">📅</div>
+                <div class="action-label">История</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Информационный баннер -->
+    <div class="banner-container">
+        <div class="banner">
+            <div class="banner-content">
+                <div class="banner-icon">🌱</div>
+                <div>
+                    <div class="banner-title">Осенний фестиваль</div>
+                    <div class="banner-desc">Криптовалютные подарки всем активным пользователям!</div>
+                </div>
+            </div>
+            <div class="banner-arrow">›</div>
+        </div>
+        <div class="dots">
+            <div class="dot active"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
+
+    <!-- Мои активы -->
+    <div class="assets-section">
+        <div class="assets-header">
+            <div class="assets-title">Мои активы ›</div>
+            <div class="hide-small">Скрыть мелкие балансы</div>
+        </div>
+
+        <div class="asset-list">
+            <!-- Tether -->
+            <div class="asset-item">
+                <div class="asset-left">
+                    <div class="asset-logo logo-usdt">₮</div>
+                    <div>
+                        <div class="asset-name">Tether</div>
+                        <div class="asset-sub">$1.00 <span style="color: #4caf50;">0.00%</span></div>
+                    </div>
+                </div>
+                <div class="asset-right">
+                    <div class="asset-amount" id="usdt-val">0.00 USDT</div>
+                    <div class="asset-converted" id="usdt-usd">$0.00</div>
+                </div>
+            </div>
+
+            <!-- Toncoin -->
+            <div class="asset-item">
+                <div class="asset-left">
+                    <div class="asset-logo logo-ton">💎</div>
+                    <div>
+                        <div class="asset-name">Toncoin</div>
+                        <div class="asset-sub" id="ton-rate">$5.20</div>
+                    </div>
+                </div>
+                <div class="asset-right">
+                    <div class="asset-amount" id="ton-val">0.00 TON</div>
+                    <div class="asset-converted" id="ton-usd">$0.00</div>
+                </div>
+            </div>
+
+            <!-- Bitcoin -->
+            <div class="asset-item">
+                <div class="asset-left">
+                    <div class="asset-logo logo-btc">₿</div>
+                    <div>
+                        <div class="asset-name">Bitcoin</div>
+                        <div class="asset-sub" id="btc-rate">$65,000</div>
+                    </div>
+                </div>
+                <div class="asset-right">
+                    <div class="asset-amount" id="btc-val">0.0000 BTC</div>
+                    <div class="asset-converted" id="btc-usd">$0.00</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.setHeaderColor('#3d2b20');
+
+        const API_URL = "http://localhost:8000"; // Замени на свой адрес сервака
+
+        let isHidden = false;
+
+        function toggleHide() {
+            isHidden = !isHidden;
+            const bal = document.getElementById('total-balance');
+            bal.innerText = isHidden ? '••••••' : window.totalVal || '0.00';
+        }
+
+        async function loadData() {
+            try {
+                const res = await fetch(`${API_URL}/api/me`, {
+                    headers: { 'X-Init-Data': tg.initData }
+                });
+                const data = await res.json();
+
+                window.totalVal = data.total_usd.toFixed(2);
+                document.getElementById('total-balance').innerText = window.totalVal;
+
+                // Заполнение сумм
+                document.getElementById('usdt-val').innerText = `${data.balances.USDT.toFixed(2)} USDT`;
+                document.getElementById('usdt-usd').innerText = `$${data.balances.USDT.toFixed(2)}`;
+
+                document.getElementById('ton-val').innerText = `${data.balances.TON.toFixed(4)} TON`;
+                document.getElementById('btc-val').innerText = `${data.balances.BTC.toFixed(6)} BTC`;
+
+            } catch (e) {
+                console.error("Ошибка загрузки данных:", e);
+            }
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
