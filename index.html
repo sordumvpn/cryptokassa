@@ -31,7 +31,7 @@
             overflow-x: hidden;
         }
 
-        /* Шапка с градиентом под дерево/темный шоколад */
+        /* Шапка с градиентом под темное дерево */
         .header {
             background: linear-gradient(180deg, #3d2b20 0%, #201712 100%);
             padding: 16px 20px 24px 20px;
@@ -272,7 +272,7 @@
 </head>
 <body>
 
-    <!-- Шапка с кнопками действий -->
+    <!-- Шапка -->
     <div class="header">
         <div class="top-bar">
             <div class="icon-btn">📷</div>
@@ -289,15 +289,15 @@
         <div class="balance-subtitle">Общий баланс в USD</div>
 
         <div class="action-buttons">
-            <div class="action-item" onclick="tg.sendData('action_deposit')">
+            <div class="action-item" onclick="sendAction('deposit')">
                 <div class="action-icon">↙</div>
                 <div class="action-label">Пополнить</div>
             </div>
-            <div class="action-item" onclick="tg.sendData('action_withdraw')">
+            <div class="action-item" onclick="sendAction('withdraw')">
                 <div class="action-icon">↗</div>
                 <div class="action-label">Вывести</div>
             </div>
-            <div class="action-item" onclick="tg.sendData('action_history')">
+            <div class="action-item" onclick="sendAction('history')">
                 <div class="action-icon">📅</div>
                 <div class="action-label">История</div>
             </div>
@@ -323,7 +323,7 @@
         </div>
     </div>
 
-    <!-- Мои активы -->
+    <!-- Список активов -->
     <div class="assets-section">
         <div class="assets-header">
             <div class="assets-title">Мои активы ›</div>
@@ -331,7 +331,6 @@
         </div>
 
         <div class="asset-list">
-            <!-- Tether -->
             <div class="asset-item">
                 <div class="asset-left">
                     <div class="asset-logo logo-usdt">₮</div>
@@ -346,7 +345,6 @@
                 </div>
             </div>
 
-            <!-- Toncoin -->
             <div class="asset-item">
                 <div class="asset-left">
                     <div class="asset-logo logo-ton">💎</div>
@@ -361,7 +359,6 @@
                 </div>
             </div>
 
-            <!-- Bitcoin -->
             <div class="asset-item">
                 <div class="asset-left">
                     <div class="asset-logo logo-btc">₿</div>
@@ -383,35 +380,51 @@
         tg.expand();
         tg.setHeaderColor('#3d2b20');
 
-        const API_URL = "http://localhost:8000"; // Замени на свой адрес сервака
+        const API_URL = "https://defiant-clothes-mandarin.ngrok-free.dev";
 
         let isHidden = false;
 
         function toggleHide() {
             isHidden = !isHidden;
             const bal = document.getElementById('total-balance');
-            bal.innerText = isHidden ? '••••••' : window.totalVal || '0.00';
+            bal.innerText = isHidden ? '••••••' : (window.totalVal || '0.00');
+        }
+
+        function sendAction(action) {
+            tg.sendData(JSON.stringify({ action: action }));
+            tg.close();
         }
 
         async function loadData() {
             try {
                 const res = await fetch(`${API_URL}/api/me`, {
-                    headers: { 'X-Init-Data': tg.initData }
+                    headers: { 
+                        'X-Init-Data': tg.initData,
+                        'ngrok-skip-browser-warning': 'true'
+                    }
                 });
+
+                if (!res.ok) {
+                    console.error("Сервер вернул ошибку:", res.status);
+                    return;
+                }
+
                 const data = await res.json();
 
                 window.totalVal = data.total_usd.toFixed(2);
                 document.getElementById('total-balance').innerText = window.totalVal;
 
-                // Заполнение сумм
                 document.getElementById('usdt-val').innerText = `${data.balances.USDT.toFixed(2)} USDT`;
                 document.getElementById('usdt-usd').innerText = `$${data.balances.USDT.toFixed(2)}`;
 
                 document.getElementById('ton-val').innerText = `${data.balances.TON.toFixed(4)} TON`;
+                document.getElementById('btc-val').innerText = `$${(data.balances.TON * 5.2).toFixed(2)}`;
+
                 document.getElementById('btc-val').innerText = `${data.balances.BTC.toFixed(6)} BTC`;
+                document.getElementById('btc-usd').innerText = `$${(data.balances.BTC * 65000).toFixed(2)}`;
 
             } catch (e) {
-                console.error("Ошибка загрузки данных:", e);
+                console.error(" Ошибка загрузки данных:", e);
             }
         }
 
