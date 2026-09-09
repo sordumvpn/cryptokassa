@@ -1,366 +1,269 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CryptoKassa</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        :root {
-            --bg-color: #121820;
-            --card-bg: #1c2733;
-            --header-bg: #2a221b;
-            --text-color: #ffffff;
-            --text-secondary: #8b96a3;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crypto Kassa</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #121212;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
 
-        * {
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
-        }
+    .container {
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-        }
+    .header {
+      text-align: center;
+      margin-top: 10px;
+    }
 
-        /* Шапка */
-        .header {
-            background: linear-gradient(180deg, #3d2b20 0%, #201712 100%);
-            padding: 16px 20px 24px 20px;
-            text-align: center;
-        }
+    .balance-title {
+      color: #8e8e93;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
 
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+    .total-balance {
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 25px;
+    }
 
-        .icon-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 18px;
-        }
+    .actions {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 30px;
+    }
 
-        .top-right {
-            display: flex;
-            gap: 10px;
-        }
+    .action-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: none;
+      border: none;
+      color: #007aff;
+      font-size: 13px;
+      cursor: pointer;
+    }
 
-        .main-balance {
-            font-size: 36px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
+    .action-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: #1c1c1e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
 
-        .eye-icon {
-            font-size: 20px;
-            opacity: 0.7;
-            cursor: pointer;
-        }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
 
-        .balance-subtitle {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-top: 4px;
-            margin-bottom: 24px;
-        }
+    .modal-content {
+      background: #1c1c1e;
+      padding: 24px;
+      border-radius: 16px;
+      width: 85%;
+      max-width: 340px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
 
-        .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 24px;
-        }
+    .input-group {
+      margin-bottom: 15px;
+    }
 
-        .action-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
+    .input-group label {
+      display: block;
+      font-size: 12px;
+      color: #8e8e93;
+      margin-bottom: 5px;
+    }
 
-        .action-icon {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-        }
+    .input-group input, .input-group select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      background: #2c2c2e;
+      color: #fff;
+      border: 1px solid #3a3a3c;
+      box-sizing: border-box;
+      font-size: 15px;
+    }
 
-        .action-label {
-            font-size: 13px;
-            font-weight: 500;
-        }
+    .modal-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 20px;
+    }
 
-        /* Баннер */
-        .banner-container {
-            padding: 16px;
-            background: var(--bg-color);
-        }
+    .btn-cancel {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      background: #3a3a3c;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
 
-        .banner {
-            background: #2a2024;
-            border-left: 4px solid #ff5e3a;
-            border-radius: 12px;
-            padding: 14px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .banner-content {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .banner-icon { font-size: 28px; }
-        .banner-title { color: #ff5e3a; font-size: 14px; font-weight: 600; }
-        .banner-desc { font-size: 12px; color: #d1d5db; margin-top: 2px; }
-
-        .dots {
-            display: flex;
-            justify-content: center;
-            gap: 6px;
-            margin-top: 10px;
-        }
-
-        .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); }
-        .dot.active { width: 16px; border-radius: 4px; background: #0088cc; }
-
-        /* Список активов */
-        .assets-section { padding: 0 16px; }
-        .assets-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .assets-title { font-size: 16px; font-weight: 600; color: #0088cc; }
-        .hide-small { font-size: 13px; color: #0088cc; cursor: pointer; }
-
-        .asset-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .asset-left { display: flex; align-items: center; gap: 12px; }
-        .asset-logo {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .logo-usdt { background: #26a17b; color: white; }
-        .logo-ton { background: #0088cc; color: white; }
-        .logo-btc { background: #f7931a; color: white; }
-
-        .asset-name { font-size: 16px; font-weight: 600; }
-        .asset-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
-        .asset-right { text-align: right; }
-        .asset-amount { font-size: 15px; font-weight: 600; }
-        .asset-converted { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
-    </style>
+    .btn-submit {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      background: #007aff;
+      color: #fff;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
 
+  <div class="container">
     <div class="header">
-        <div class="top-bar">
-            <div class="icon-btn">📷</div>
-            <div class="top-right">
-                <div class="icon-btn">🖼</div>
-                <div class="icon-btn">⚙️</div>
-            </div>
-        </div>
-
-        <div class="main-balance">
-            <span>$</span><span id="total-balance">0.00</span>
-            <span class="eye-icon" onclick="toggleHide()">👁</span>
-        </div>
-        <div class="balance-subtitle">Общий баланс в USD</div>
-
-        <div class="action-buttons">
-            <div class="action-item" onclick="handleAction('deposit')">
-                <div class="action-icon">↙</div>
-                <div class="action-label">Пополнить</div>
-            </div>
-            <div class="action-item" onclick="handleAction('withdraw')">
-                <div class="action-icon">↗</div>
-                <div class="action-label">Вывести</div>
-            </div>
-            <div class="action-item" onclick="handleAction('history')">
-                <div class="action-icon">📅</div>
-                <div class="action-label">История</div>
-            </div>
-        </div>
+      <div class="balance-title">Общий баланс в USD</div>
+      <div class="total-balance" id="total-balance">$0.00</div>
     </div>
 
-    <div class="banner-container">
-        <div class="banner">
-            <div class="banner-content">
-                <div class="banner-icon">🌱</div>
-                <div>
-                    <div class="banner-title">Осенний фестиваль</div>
-                    <div class="banner-desc">Криптовалютные подарки всем активным пользователям!</div>
-                </div>
-            </div>
-        </div>
-        <div class="dots">
-            <div class="dot active"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-        </div>
+    <div class="actions">
+      <button class="action-btn" onclick="openWithdrawModal()">
+        <div class="action-icon">📤</div>
+        <span>Перевод</span>
+      </button>
     </div>
+  </div>
 
-    <div class="assets-section">
-        <div class="assets-header">
-            <div class="assets-title">Мои активы ›</div>
-            <div class="hide-small">Скрыть мелкие балансы</div>
-        </div>
+  <!-- Модальное окно вывода средств -->
+  <div class="modal" id="withdraw-modal">
+    <div class="modal-content">
+      <h3 style="margin-top:0; margin-bottom:15px;">Вывод криптовалюты</h3>
+      
+      <div class="input-group">
+        <label>Монета:</label>
+        <select id="withdraw-coin">
+          <option value="USDT">USDT</option>
+          <option value="TON">TON</option>
+          <option value="BTC">BTC</option>
+        </select>
+      </div>
 
-        <div class="asset-list">
-            <!-- Tether -->
-            <div class="asset-item">
-                <div class="asset-left">
-                    <div class="asset-logo logo-usdt">₮</div>
-                    <div>
-                        <div class="asset-name">Tether</div>
-                        <div class="asset-sub">$1.00</div>
-                    </div>
-                </div>
-                <div class="asset-right">
-                    <div class="asset-amount" id="usdt-val">0.00 USDT</div>
-                    <div class="asset-converted" id="usdt-usd">$0.00</div>
-                </div>
-            </div>
+      <div class="input-group">
+        <label>Адрес получателя:</label>
+        <input type="text" id="withdraw-address" placeholder="Введите адрес кошелька...">
+      </div>
 
-            <!-- Toncoin -->
-            <div class="asset-item">
-                <div class="asset-left">
-                    <div class="asset-logo logo-ton">💎</div>
-                    <div>
-                        <div class="asset-name">Toncoin</div>
-                        <div class="asset-sub">$5.20</div>
-                    </div>
-                </div>
-                <div class="asset-right">
-                    <div class="asset-amount" id="ton-val">0.00 TON</div>
-                    <div class="asset-converted" id="ton-usd">$0.00</div>
-                </div>
-            </div>
+      <div class="input-group">
+        <label>Сумма:</label>
+        <input type="number" id="withdraw-amount" placeholder="0.00" step="any">
+      </div>
 
-            <!-- Bitcoin -->
-            <div class="asset-item">
-                <div class="asset-left">
-                    <div class="asset-logo logo-btc">₿</div>
-                    <div>
-                        <div class="asset-name">Bitcoin</div>
-                        <div class="asset-sub">$65,000</div>
-                    </div>
-                </div>
-                <div class="asset-right">
-                    <div class="asset-amount" id="btc-val">0.0000 BTC</div>
-                    <div class="asset-converted" id="btc-usd">$0.00</div>
-                </div>
-            </div>
-        </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeWithdrawModal()">Отмена</button>
+        <button class="btn-submit" onclick="submitWithdraw()">Отправить</button>
+      </div>
     </div>
+  </div>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.setHeaderColor('#3d2b20');
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
 
-        // Ссылка на твой сервер ngrok
-        const API_URL = "https://defiant-clothes-mandarin.ngrok-free.dev";
+    // Укажи текущий URL ngrok
+    const API_URL = "https://defiant-clothes-mandarin.ngrok-free.dev";
 
-        let isHidden = false;
+    async function loadData() {
+      try {
+        const res = await fetch(`${API_URL}/api/me`, {
+          headers: {
+            'X-Init-Data': tg.initData || '',
+            'ngrok-skip-browser-warning': 'true'
+          }
+        });
+        const data = await res.json();
+        if (data.total_usd !== undefined) {
+          document.getElementById('total-balance').innerText = `$ ${data.total_usd.toFixed(2)}`;
+        }
+      } catch (e) {
+        console.error("Ошибка загрузки данных:", e);
+      }
+    }
 
-        function toggleHide() {
-            isHidden = !isHidden;
-            document.getElementById('total-balance').innerText = isHidden ? '••••••' : (window.totalVal || '0.00');
+    function openWithdrawModal() {
+      document.getElementById('withdraw-modal').style.display = 'flex';
+    }
+
+    function closeWithdrawModal() {
+      document.getElementById('withdraw-modal').style.display = 'none';
+    }
+
+    async function submitWithdraw() {
+      const coin = document.getElementById('withdraw-coin').value;
+      const address = document.getElementById('withdraw-address').value.trim();
+      const amount = parseFloat(document.getElementById('withdraw-amount').value);
+
+      if (!address) {
+        alert("Введите адрес получателя!");
+        return;
+      }
+      if (!amount || amount <= 0) {
+        alert("Введите корректную сумму!");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_URL}/api/withdraw`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Init-Data': tg.initData || '',
+            'ngrok-skip-browser-warning': 'true'
+          },
+          body: JSON.stringify({ coin, address, amount })
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          alert("Ошибка: " + (data.detail || "Не удалось совершить перевод"));
+          return;
         }
 
-        // Обработка кликов по кнопкам без падения приложения
-        function handleAction(action) {
-            if (action === 'deposit') {
-                tg.showAlert("Для пополнения отправьте криптовалюту на ваш адрес в меню бота.");
-            } else if (action === 'withdraw') {
-                tg.showAlert("Функция вывода средств откроется в следующем окне.");
-            } else if (action === 'history') {
-                tg.showAlert("История транзакций загружается...");
-            }
-        }
-
-        async function loadData() {
-            try {
-                const res = await fetch(`${API_URL}/api/me`, {
-                    headers: { 
-                        'X-Init-Data': tg.initData,
-                        'ngrok-skip-browser-warning': 'true'
-                    }
-                });
-
-                if (!res.ok) {
-                    console.error("HTTP error:", res.status);
-                    return;
-                }
-
-                const data = await res.json();
-
-                window.totalVal = Number(data.total_usd).toFixed(2);
-                document.getElementById('total-balance').innerText = window.totalVal;
-
-                // Балансы USDT
-                const usdt = Number(data.balances.USDT || 0);
-                document.getElementById('usdt-val').innerText = `${usdt.toFixed(2)} USDT`;
-                document.getElementById('usdt-usd').innerText = `$${usdt.toFixed(2)}`;
-
-                // Балансы TON
-                const ton = Number(data.balances.TON || 0);
-                document.getElementById('ton-val').innerText = `${ton.toFixed(2)} TON`;
-                document.getElementById('ton-usd').innerText = `$${(ton * 5.2).toFixed(2)}`;
-
-                // Балансы BTC
-                const btc = Number(data.balances.BTC || 0);
-                document.getElementById('btc-val').innerText = `${btc.toFixed(4)} BTC`;
-                document.getElementById('btc-usd').innerText = `$${(btc * 65000).toFixed(2)}`;
-
-            } catch (e) {
-                console.error("Ошибка загрузки данных:", e);
-            }
-        }
-
+        alert(`Перевод успешный! Отправлено ${amount} ${coin}`);
+        closeWithdrawModal();
         loadData();
-    </script>
+      } catch (e) {
+        alert("Ошибка подключения к серверу: " + e.message);
+      }
+    }
+
+    loadData();
+  </script>
 </body>
 </html>
